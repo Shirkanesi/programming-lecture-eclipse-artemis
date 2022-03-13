@@ -37,6 +37,8 @@ public class CustomButtonDialog extends Dialog {
 	private final AssessmentViewController viewController;
 	private final String ratingGroupName;
 	private boolean closedByOk;
+	
+	private boolean forcePenaltyField;
 
 	public CustomButtonDialog(Shell parentShell, AssessmentViewController viewController, String ratingGroupName, IMistakeType mistake) {
 		super(parentShell);
@@ -91,32 +93,52 @@ public class CustomButtonDialog extends Dialog {
 		}
 
 		this.customMessageInputField.setLayoutData(customMessageInputFieldData);
-		if (this.customMistake != null) { // Don't display the spinner if points are determined internally.
+		this.customMessageInputField.setText(this.customMessage);
+		if (this.customMistake != null || this.forcePenaltyField) { // Don't display the spinner if points are determined internally.
 			final Label customPenaltyLabel = new Label(comp, SWT.RIGHT);
 			customPenaltyLabel.setText("Custom Penalty: ");
 			this.customPenaltyInputField = new Spinner(comp, SWT.SINGLE | SWT.BORDER);
 			this.customPenaltyInputField.setDigits(1);
 			this.customPenaltyInputField.setIncrement(5);
+			this.customPenaltyInputField.setSelection((int)(customPenalty * 10));
 			this.customPenaltyInputField.setLayoutData(data);
 		}
 
 		return comp;
 	}
 
+	public void setForcePenaltyField(boolean forcePenaltyField) {
+		this.forcePenaltyField = forcePenaltyField;
+	}
+	
+	public void setCustomMessage(String customMessage) {
+		this.customMessage = customMessage;
+		if (this.customMessageInputField != null) {
+			this.customMessageInputField.setText(this.customMessage);			
+		}
+	}
+	
 	public String getCustomMessage() {
 		return this.customMessage;
 	}
 
+	public void setCustomPenalty(Double customPenalty) {
+		this.customPenalty = customPenalty;
+		if (this.customPenaltyInputField != null) {
+			this.customPenaltyInputField.setSelection((int)(customPenalty * 10));
+		}
+	}
+	
 	public Double getCustomPenalty() {
 		return this.customPenalty;
 	}
-
+	
 	@Override
 	protected void okPressed() {
 		this.closedByOk = true;
 		this.customMessage = this.customMessageInputField.getText();
+		this.customPenalty = Double.parseDouble(this.customPenaltyInputField.getText().replace(',', '.'));
 		if (this.customMistake != null) { // don't create an annotation iff the annotation is generated externally.
-			this.customPenalty = Double.parseDouble(this.customPenaltyInputField.getText().replace(',', '.'));
 			this.viewController.addAssessmentAnnotation(this.customMistake, this.customMessage, this.customPenalty, this.ratingGroupName);
 		}
 		super.okPressed();
