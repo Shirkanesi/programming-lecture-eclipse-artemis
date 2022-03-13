@@ -1,5 +1,7 @@
 package edu.kit.kastel.eclipse.grading.view.assessment;
 
+import java.util.Objects;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -37,10 +39,11 @@ public class CustomButtonDialog extends Dialog {
 	private final AssessmentViewController viewController;
 	private final String ratingGroupName;
 	private boolean closedByOk;
-	
+
 	private boolean forcePenaltyField;
 
-	public CustomButtonDialog(Shell parentShell, AssessmentViewController viewController, String ratingGroupName, IMistakeType mistake) {
+	public CustomButtonDialog(Shell parentShell, AssessmentViewController viewController, String ratingGroupName,
+			IMistakeType mistake) {
 		super(parentShell);
 		this.viewController = viewController;
 		this.ratingGroupName = ratingGroupName;
@@ -63,7 +66,8 @@ public class CustomButtonDialog extends Dialog {
 	protected Control createDialogArea(Composite parent) {
 		final Composite comp = (Composite) super.createDialogArea(parent);
 
-		boolean userWantsBigWindow = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.PREFERS_LARGE_PENALTY_TEXT_PATH);
+		boolean userWantsBigWindow = Activator.getDefault().getPreferenceStore()
+				.getBoolean(PreferenceConstants.PREFERS_LARGE_PENALTY_TEXT_PATH);
 
 		final GridLayout layout = (GridLayout) comp.getLayout();
 		layout.numColumns = userWantsBigWindow ? 1 : 2;
@@ -75,16 +79,19 @@ public class CustomButtonDialog extends Dialog {
 
 		GridData customMessageInputFieldData;
 		if (userWantsBigWindow) {
-			int textWrapping = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.PREFERS_TEXT_WRAPPING_IN_PENALTY_TEXT_PATH) ? SWT.WRAP
-					: 0;
-			this.customMessageInputField = new Text(comp, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | textWrapping);
+			int textWrapping = Activator.getDefault().getPreferenceStore()
+					.getBoolean(PreferenceConstants.PREFERS_TEXT_WRAPPING_IN_PENALTY_TEXT_PATH) ? SWT.WRAP : 0;
+			this.customMessageInputField = new Text(comp,
+					SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | textWrapping);
 			customMessageInputFieldData = new GridData(GridData.FILL_BOTH);
 
 			// Calculating height and width based on the lineHeight (theoretically) ensures
 			// proper scaling across screen-sizes.
 			// However lacking of a 4K-screen this has not been tested entirely.
-			customMessageInputFieldData.minimumHeight = this.customMessageInputField.getLineHeight() * CUSTOM_PENALTY_FIELD_HEIGHT_MULTIPLIER;
-			customMessageInputFieldData.minimumWidth = this.customMessageInputField.getLineHeight() * CUSTOM_PENALTY_FIELD_WIDTH_MULTIPLIER;
+			customMessageInputFieldData.minimumHeight = this.customMessageInputField.getLineHeight()
+					* CUSTOM_PENALTY_FIELD_HEIGHT_MULTIPLIER;
+			customMessageInputFieldData.minimumWidth = this.customMessageInputField.getLineHeight()
+					* CUSTOM_PENALTY_FIELD_WIDTH_MULTIPLIER;
 
 			this.customMessageInputField.addKeyListener(new MultiLineTextEditorKeyListener(this));
 		} else {
@@ -93,14 +100,16 @@ public class CustomButtonDialog extends Dialog {
 		}
 
 		this.customMessageInputField.setLayoutData(customMessageInputFieldData);
-		this.customMessageInputField.setText(this.customMessage);
-		if (this.customMistake != null || this.forcePenaltyField) { // Don't display the spinner if points are determined internally.
+		this.customMessageInputField.setText(Objects.requireNonNullElse(this.customMessage, ""));
+		if (this.customMistake != null || this.forcePenaltyField) { // Don't display the spinner if points are
+																	// determined internally.
 			final Label customPenaltyLabel = new Label(comp, SWT.RIGHT);
 			customPenaltyLabel.setText("Custom Penalty: ");
 			this.customPenaltyInputField = new Spinner(comp, SWT.SINGLE | SWT.BORDER);
 			this.customPenaltyInputField.setDigits(1);
 			this.customPenaltyInputField.setIncrement(5);
-			this.customPenaltyInputField.setSelection((int)(customPenalty * 10));
+			this.customPenaltyInputField
+					.setSelection((int) Objects.requireNonNullElse(customPenalty * 10, 0d).doubleValue());
 			this.customPenaltyInputField.setLayoutData(data);
 		}
 
@@ -110,14 +119,14 @@ public class CustomButtonDialog extends Dialog {
 	public void setForcePenaltyField(boolean forcePenaltyField) {
 		this.forcePenaltyField = forcePenaltyField;
 	}
-	
+
 	public void setCustomMessage(String customMessage) {
 		this.customMessage = customMessage;
 		if (this.customMessageInputField != null) {
-			this.customMessageInputField.setText(this.customMessage);			
+			this.customMessageInputField.setText(this.customMessage);
 		}
 	}
-	
+
 	public String getCustomMessage() {
 		return this.customMessage;
 	}
@@ -125,21 +134,24 @@ public class CustomButtonDialog extends Dialog {
 	public void setCustomPenalty(Double customPenalty) {
 		this.customPenalty = customPenalty;
 		if (this.customPenaltyInputField != null) {
-			this.customPenaltyInputField.setSelection((int)(customPenalty * 10));
+			this.customPenaltyInputField.setSelection((int) (customPenalty * 10));
 		}
 	}
-	
+
 	public Double getCustomPenalty() {
 		return this.customPenalty;
 	}
-	
+
 	@Override
 	protected void okPressed() {
 		this.closedByOk = true;
 		this.customMessage = this.customMessageInputField.getText();
-		this.customPenalty = Double.parseDouble(this.customPenaltyInputField.getText().replace(',', '.'));
-		if (this.customMistake != null) { // don't create an annotation iff the annotation is generated externally.
-			this.viewController.addAssessmentAnnotation(this.customMistake, this.customMessage, this.customPenalty, this.ratingGroupName);
+		if (this.customPenaltyInputField != null) {
+			this.customPenalty = Double.parseDouble(this.customPenaltyInputField.getText().replace(',', '.'));
+			if (this.customMistake != null) { // don't create an annotation iff the annotation is generated externally.
+				this.viewController.addAssessmentAnnotation(this.customMistake, this.customMessage, this.customPenalty,
+						this.ratingGroupName);
+			}
 		}
 		super.okPressed();
 	}
