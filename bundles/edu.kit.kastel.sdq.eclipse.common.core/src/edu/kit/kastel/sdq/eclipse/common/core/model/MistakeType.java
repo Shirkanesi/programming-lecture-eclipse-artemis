@@ -90,6 +90,11 @@ public class MistakeType implements IMistakeType {
 		return this.message + "\n" + penaltyText;
 	}
 
+	@Override
+	public String getPenaltyContextInformation(List<IAnnotation> annotations) {
+		return this.penaltyRule.getPenaltyContextInformation(annotations);
+	}
+
 	/**
 	 * Sets a new rating group if there ain't already one. (Used for
 	 * deserialization).

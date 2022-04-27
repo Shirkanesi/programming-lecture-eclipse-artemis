@@ -34,5 +34,8 @@ public abstract class PenaltyRule {
 	 */
 	public abstract String getTooltip(List<IAnnotation> annotations);
 
+	public abstract String getPenaltyContextInformation(List<IAnnotation> annotations);
+
 	protected abstract boolean isCustomPenalty();
+
 }

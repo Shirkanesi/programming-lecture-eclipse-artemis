@@ -57,6 +57,14 @@ public interface IMistakeType {
 	String getTooltip(List<IAnnotation> annotations);
 
 	/**
+	 * 
+	 * @param annotations
+	 * @return additional information about the context of a penalty to be used in
+	 *         the annotations stored in Artemis (e.g. threshold)
+	 */
+	String getPenaltyContextInformation(List<IAnnotation> annotations);
+
+	/**
 	 * Indicates whether this is a custom penalty.
 	 *
 	 * @return indicator for custom penalties

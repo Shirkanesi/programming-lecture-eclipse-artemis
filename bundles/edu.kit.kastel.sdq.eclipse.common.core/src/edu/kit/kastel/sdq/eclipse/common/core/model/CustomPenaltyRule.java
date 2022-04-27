@@ -39,6 +39,11 @@ public class CustomPenaltyRule extends PenaltyRule {
 	}
 
 	@Override
+	public String getPenaltyContextInformation(List<IAnnotation> annotations) {
+		return String.format("%d annoations made", annotations.size());
+	}
+
+	@Override
 	public String toString() {
 		return "CustomPenaltyRule";
 	}

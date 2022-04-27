@@ -245,7 +245,14 @@ public class AnnotationMapper {
 			final List<IAnnotation> currentAnnotations = this.annotations.stream() //
 					.filter(annotation -> annotation.getMistakeType().equals(mistakeType)) //
 					.collect(Collectors.toList());
-			lines.add("\n    * \"" + mistakeType.getButtonText() + "\" [" + nf.format(currentPenalty) + "]:");
+
+			lines.add("\n    * \"" + mistakeType.getButtonText() + "\" [" + nf.format(currentPenalty) + "P]:");
+
+			String additionalContext = mistakeType.getPenaltyContextInformation(currentAnnotations);
+			if (!additionalContext.isBlank()) {
+				lines.add("\n        (" + additionalContext + "):");
+			}
+
 			if (mistakeType.isCustomPenalty()) {
 				for (var annotation : currentAnnotations) {
 					String penalty = nf.format(-annotation.getCustomPenalty().get());

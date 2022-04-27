@@ -44,6 +44,11 @@ public class ThresholdPenaltyRule extends PenaltyRule {
 	}
 
 	@Override
+	public String getPenaltyContextInformation(List<IAnnotation> annotations) {
+		return String.format("%d of at least %d annotations made", annotations.size(), this.threshold);
+	}
+
+	@Override
 	public String toString() {
 		return "ThresholdPenaltyRule [threshold=" + this.threshold + ", penalty=" + this.penalty + "]";
 	}
