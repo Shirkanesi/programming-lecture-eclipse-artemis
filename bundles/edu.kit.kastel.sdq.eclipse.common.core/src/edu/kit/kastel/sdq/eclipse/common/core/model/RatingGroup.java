@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.eclipse.common.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -62,6 +63,22 @@ public class RatingGroup implements IRatingGroup {
 	public String toString() {
 		return "RatingGroup [" + "shortName=" + this.shortName + ", displayName=" + this.displayName + ", penaltyLimit= "
 				+ (this.hasPenaltyLimit() ? this.penaltyLimit : "NO_LIMIT") + "]";
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (!(obj instanceof RatingGroup other)) {
+			return false;
+		}
+		return other.shortName.equals(this.shortName);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.shortName);
 	}
 
 }

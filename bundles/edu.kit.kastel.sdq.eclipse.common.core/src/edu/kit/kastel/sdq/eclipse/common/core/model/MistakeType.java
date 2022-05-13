@@ -29,7 +29,7 @@ public class MistakeType implements IMistakeType {
 	 */
 	@JsonCreator
 	public MistakeType(@JsonProperty("shortName") String shortName, @JsonProperty("button") String buttonName, @JsonProperty("message") String message,
-			@JsonProperty("penaltyRule") PenaltyRule penaltyRule, @JsonProperty("appliesTo") String appliesTo) {
+			@JsonProperty("penaltyRule") PenaltyRule penaltyRule, @JsonProperty("appliesTo") String appliesTo, @JsonProperty("displayGroup") String displayGroup) {
 		this.shortName = shortName;
 		this.name = buttonName;
 		this.message = message;

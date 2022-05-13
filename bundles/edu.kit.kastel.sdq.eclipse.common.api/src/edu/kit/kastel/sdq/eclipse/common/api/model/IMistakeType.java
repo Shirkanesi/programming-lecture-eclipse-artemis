@@ -48,6 +48,8 @@ public interface IMistakeType {
 	 */
 	IRatingGroup getRatingGroup();
 
+	IDisplayGroup getDisplayGroup();
+	
 	/**
 	 *
 	 * @param annotations

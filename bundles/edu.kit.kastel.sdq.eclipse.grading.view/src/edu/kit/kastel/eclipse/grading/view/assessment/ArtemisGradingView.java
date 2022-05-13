@@ -81,18 +81,20 @@ public class ArtemisGradingView extends ViewPart {
 	}
 
 	private void addListenerForMarkerDeletion() {
-		AssessmentUtilities.getWorkspace()
-				.addResourceChangeListener(event -> Arrays.asList(event.findMarkerDeltas(AssessmentUtilities.MARKER_CLASS_NAME, true)).forEach(marker -> {
+		AssessmentUtilities.getWorkspace().addResourceChangeListener(event -> Arrays
+				.asList(event.findMarkerDeltas(AssessmentUtilities.MARKER_CLASS_NAME, true)).forEach(marker -> {
 					// check if marker is deleted
 					if (marker.getKind() == 2) {
-						this.viewController.deleteAnnotation((String) marker.getAttribute(AssessmentUtilities.MARKER_ATTRIBUTE_ANNOTATION_ID));
+						this.viewController.deleteAnnotation(
+								(String) marker.getAttribute(AssessmentUtilities.MARKER_ATTRIBUTE_ANNOTATION_ID));
 						this.updatePenalties();
 					}
 				}));
 	}
 
 	private void initializeAnnotationEditing() {
-		IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(AssessmentMarkerView.class.getName());
+		IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.findView(AssessmentMarkerView.class.getName());
 		if (view instanceof AssessmentMarkerView markerView) {
 			markerView.addDoubleClickListener(new AssessmentMarkerViewDoubleClickListener(this));
 		}
@@ -216,7 +218,8 @@ public class ArtemisGradingView extends ViewPart {
 		customButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		customButton.setText(mistake.getButtonText());
 		customButton.addListener(SWT.Selection, event -> {
-			final CustomButtonDialog customDialog = new CustomButtonDialog(AssessmentUtilities.getWindowsShell(), this.viewController, mistake);
+			final CustomButtonDialog customDialog = new CustomButtonDialog(AssessmentUtilities.getWindowsShell(),
+					this.viewController, mistake);
 			customDialog.setBlockOnOpen(true);
 			customDialog.open();
 			// avoid SWT Exception
@@ -227,15 +230,19 @@ public class ArtemisGradingView extends ViewPart {
 	private void fillExamComboList(Combo courseCombo, Combo examCombo, Combo examExerciseCombo) {
 		examCombo.removeAll();
 		examExerciseCombo.removeAll();
-		this.viewController.getExerciseShortNames(courseCombo.getItem(courseCombo.getSelectionIndex())).forEach(examExerciseCombo::add);
+		this.viewController.getExerciseShortNames(courseCombo.getItem(courseCombo.getSelectionIndex()))
+				.forEach(examExerciseCombo::add);
 		examCombo.add("None");
-		this.viewController.getExamShortNames(courseCombo.getItem(courseCombo.getSelectionIndex())).forEach(examCombo::add);
+		this.viewController.getExamShortNames(courseCombo.getItem(courseCombo.getSelectionIndex()))
+				.forEach(examCombo::add);
 		examCombo.addListener(SWT.Selection, e -> {
 			examExerciseCombo.removeAll();
 			if ("None".equals(examCombo.getItem(examCombo.getSelectionIndex()))) {
-				this.viewController.getExerciseShortNames(courseCombo.getItem(courseCombo.getSelectionIndex())).forEach(examExerciseCombo::add);
+				this.viewController.getExerciseShortNames(courseCombo.getItem(courseCombo.getSelectionIndex()))
+						.forEach(examExerciseCombo::add);
 			} else {
-				this.viewController.getExercisesShortNamesForExam(examCombo.getItem(examCombo.getSelectionIndex())).forEach(examExerciseCombo::add);
+				this.viewController.getExercisesShortNamesForExam(examCombo.getItem(examCombo.getSelectionIndex()))
+						.forEach(examExerciseCombo::add);
 			}
 			this.updateState();
 		});
@@ -247,13 +254,16 @@ public class ArtemisGradingView extends ViewPart {
 
 	private void createAssessmentTab(TabFolder tabFolder) {
 		this.assessmentTab = new AssessmentTab(tabFolder);
-		this.addControlToPossibleActions(this.assessmentTab.comboCourse, Transition.SET_COURSE_ID_AND_GET_EXERCISE_SHORT_NAMES);
+		this.addControlToPossibleActions(this.assessmentTab.comboCourse,
+				Transition.SET_COURSE_ID_AND_GET_EXERCISE_SHORT_NAMES);
 		/*
 		 * The exam combo does not really have an influence on the backend state, but
 		 * should be disabled after a new assessment is started
 		 */
-		this.addControlToPossibleActions(this.assessmentTab.comboExam, Transition.SET_COURSE_ID_AND_GET_EXERCISE_SHORT_NAMES);
-		this.loadExamComboEntries(this.assessmentTab.comboCourse, this.assessmentTab.comboExam, this.assessmentTab.comboExercise);
+		this.addControlToPossibleActions(this.assessmentTab.comboExam,
+				Transition.SET_COURSE_ID_AND_GET_EXERCISE_SHORT_NAMES);
+		this.loadExamComboEntries(this.assessmentTab.comboCourse, this.assessmentTab.comboExam,
+				this.assessmentTab.comboExercise);
 		this.addControlToPossibleActions(this.assessmentTab.comboExercise, Transition.SET_EXERCISE_ID);
 
 		this.addSelectionListenerForReloadButton(this.assessmentTab.btnReload);
@@ -274,7 +284,8 @@ public class ArtemisGradingView extends ViewPart {
 
 	private void setVersionText(Label label) {
 		var pluginVersion = Activator.getDefault().getBundle().getVersion();
-		String versionText = String.format("Artemis Grading %d.%d.%d", pluginVersion.getMajor(), pluginVersion.getMinor(), pluginVersion.getMicro());
+		String versionText = String.format("Artemis Grading %d.%d.%d", pluginVersion.getMajor(),
+				pluginVersion.getMinor(), pluginVersion.getMicro());
 		label.setText(versionText);
 	}
 
@@ -291,46 +302,50 @@ public class ArtemisGradingView extends ViewPart {
 		this.gradingButtonComposite = new Composite(container, SWT.NONE);
 		this.viewController.setCurrentAssessmentController();
 		this.gradingButtonComposite.setLayout(new GridLayout(1, true));
+		int columns = CommonActivator.getDefault().getPreferenceStore().getInt(PreferenceConstants.GRADING_VIEW_BUTTONS_IN_COLUMN);
 		this.viewController.getRatingGroups().forEach(ratingGroup -> {
 			final Group rgDisplay = new Group(this.gradingButtonComposite, SWT.NONE);
 			this.ratingGroupViewElements.put(ratingGroup.getDisplayName(), rgDisplay);
 			this.updatePenalty(ratingGroup.getDisplayName());
-			var columns = CommonActivator.getDefault().getPreferenceStore().getInt(PreferenceConstants.GRADING_VIEW_BUTTONS_IN_COLUMN);
 			final GridLayout gridLayout = new GridLayout(columns, true);
 			rgDisplay.setLayout(gridLayout);
 			final GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 			rgDisplay.setLayoutData(gridData);
-			this.viewController.getMistakeTypes().forEach(mistake -> {
-				if (mistake.getRatingGroup().getDisplayName().equals(ratingGroup.getDisplayName())) {
-					if (mistake.isCustomPenalty()) {
-						this.createCustomButton(ratingGroup, rgDisplay, mistake);
-						return;
-					}
-					final Button mistakeButton = new Button(rgDisplay, SWT.PUSH);
-					mistakeButton.setText(mistake.getButtonText());
-					mistakeButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 
-					this.mistakeButtons.put(mistake.getId(), mistakeButton);
-					mistakeButton.setToolTipText(this.viewController.getToolTipForMistakeType(mistake));
-
-					KeyboardAwareMouseListener listener = new KeyboardAwareMouseListener();
-					// Normal click
-					listener.setClickHandler(
-							() -> AssessmentUtilities.createAssessmentAnnotation(this.viewController.getAssessmentController(), mistake, null, null),
-							SWT.BUTTON1);
-					// shift-click and middle-click
-					listener.setClickHandler(() -> this.createMistakePenaltyWithCustomMessageDialog(mistake), SWT.SHIFT, SWT.BUTTON2);
-					// every click
-					listener.setClickHandlerForEveryClick(() -> {
-						this.updatePenalty(mistake.getRatingGroup().getDisplayName());
-						this.updateMistakeButtonToolTips(mistake);
-					});
-					mistakeButton.addMouseListener(listener);
-				}
-			});
+			this.viewController.getMistakeTypes().stream()
+					.filter(mistake -> mistake.getRatingGroup().equals(ratingGroup))
+					.forEachOrdered(mistake -> this.createGradingButtonForGroupAndMistakeType(rgDisplay, mistake));
 		});
 
 		UIUtilities.initializeTabAfterFilling(container, gradingButtonComposite);
+	}
+
+	private void createGradingButtonForGroupAndMistakeType(Group buttonGroup, IMistakeType mistake) {
+		if (mistake.isCustomPenalty()) {
+			this.createCustomButton(mistake.getRatingGroup(), buttonGroup, mistake);
+			return;
+		}
+		final Button mistakeButton = new Button(buttonGroup, SWT.PUSH);
+		mistakeButton.setText(mistake.getButtonText());
+		mistakeButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+
+		this.mistakeButtons.put(mistake.getId(), mistakeButton);
+		mistakeButton.setToolTipText(this.viewController.getToolTipForMistakeType(mistake));
+
+		KeyboardAwareMouseListener listener = new KeyboardAwareMouseListener();
+		// Normal click
+		listener.setClickHandler(() -> AssessmentUtilities
+				.createAssessmentAnnotation(this.viewController.getAssessmentController(), mistake, null, null),
+				SWT.BUTTON1);
+		// shift-click and middle-click
+		listener.setClickHandler(() -> this.createMistakePenaltyWithCustomMessageDialog(mistake), SWT.SHIFT,
+				SWT.BUTTON2);
+		// every click
+		listener.setClickHandlerForEveryClick(() -> {
+			this.updatePenalty(mistake.getRatingGroup().getDisplayName());
+			this.updateMistakeButtonToolTips(mistake);
+		});
+		mistakeButton.addMouseListener(listener);
 	}
 
 	/**
@@ -342,11 +357,13 @@ public class ArtemisGradingView extends ViewPart {
 	}
 
 	private void createMistakePenaltyWithCustomMessageDialog(IMistakeType mistake) {
-		CustomButtonDialog buttonDialog = new CustomButtonDialog(AssessmentUtilities.getWindowsShell(), this.viewController, null);
+		CustomButtonDialog buttonDialog = new CustomButtonDialog(AssessmentUtilities.getWindowsShell(),
+				this.viewController, null);
 		buttonDialog.setBlockOnOpen(true);
 		buttonDialog.open();
 		if (buttonDialog.isClosedByOk()) {
-			AssessmentUtilities.createAssessmentAnnotation(this.viewController.getAssessmentController(), mistake, buttonDialog.getCustomMessage(), null);
+			AssessmentUtilities.createAssessmentAnnotation(this.viewController.getAssessmentController(), mistake,
+					buttonDialog.getCustomMessage(), null);
 		}
 	}
 
@@ -370,7 +387,8 @@ public class ArtemisGradingView extends ViewPart {
 		int idx = filterCombo.getSelectionIndex();
 		if (idx >= 0) {
 			String value = filterCombo.getItem(idx);
-			filter = Arrays.stream(SubmissionFilter.values()).filter(f -> f.name().equals(value)).findFirst().orElse(SubmissionFilter.ALL);
+			filter = Arrays.stream(SubmissionFilter.values()).filter(f -> f.name().equals(value)).findFirst()
+					.orElse(SubmissionFilter.ALL);
 		}
 		this.viewController.getSubmissionsForBacklog(filter).forEach(backlogCombo::add);
 	}
@@ -443,7 +461,8 @@ public class ArtemisGradingView extends ViewPart {
 
 	private void updateState() {
 		this.possibleActions.values().forEach(set -> set.forEach(control -> control.setEnabled(false)));
-		this.viewController.getPossiblyTransitions().forEach(transition -> this.possibleActions.get(transition).forEach(control -> control.setEnabled(true)));
+		this.viewController.getPossiblyTransitions().forEach(
+				transition -> this.possibleActions.get(transition).forEach(control -> control.setEnabled(true)));
 		this.updateCorrectedSubmissionCount();
 	}
 
@@ -458,9 +477,9 @@ public class ArtemisGradingView extends ViewPart {
 	private void updateCorrectedSubmissionCount() {
 		if (this.assessmentTab.comboExercise.getSelectionIndex() != -1) {
 			IGradingSystemwideController sc = Activator.getDefault().getSystemwideController();
-			this.assessmentTab.lblStatisticsInformation
-					.setText(I18N().tabAssessmentStartedSubmitted(sc.getBegunSubmissionsProjectNames(SubmissionFilter.ALL).size(),
-							sc.getBegunSubmissionsProjectNames(SubmissionFilter.SAVED_AND_SUBMITTED).size()));
+			this.assessmentTab.lblStatisticsInformation.setText(I18N().tabAssessmentStartedSubmitted(
+					sc.getBegunSubmissionsProjectNames(SubmissionFilter.ALL).size(),
+					sc.getBegunSubmissionsProjectNames(SubmissionFilter.SAVED_AND_SUBMITTED).size()));
 		} else {
 			this.assessmentTab.lblStatisticsInformation.setText("");
 		}
@@ -483,6 +502,7 @@ public class ArtemisGradingView extends ViewPart {
 	private void resetCombos() {
 		this.assessmentTab.resetCombos();
 		this.backlogCombo.removeAll();
-		this.viewController.getCourseShortNames().forEach(courseShortName -> this.assessmentTab.comboCourse.add(courseShortName));
+		this.viewController.getCourseShortNames()
+				.forEach(courseShortName -> this.assessmentTab.comboCourse.add(courseShortName));
 	}
 }
