@@ -2,11 +2,15 @@
 package edu.kit.kastel.eclipse.common.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.swing.JOptionPane;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -24,6 +28,9 @@ import edu.kit.kastel.eclipse.common.api.controller.IAssessmentController;
 import edu.kit.kastel.eclipse.common.api.controller.IGradingArtemisController;
 import edu.kit.kastel.eclipse.common.api.controller.IGradingSystemwideController;
 import edu.kit.kastel.eclipse.common.core.artemis.WorkspaceUtil;
+import edu.kit.kastel.eclipse.common.core.config.EmptyStudentsDAO;
+import edu.kit.kastel.eclipse.common.core.config.JsonFileStudentsDAO;
+import edu.kit.kastel.eclipse.common.core.config.StudentsDAO;
 
 public class GradingSystemwideController extends SystemwideController implements IGradingSystemwideController {
 
@@ -31,23 +38,36 @@ public class GradingSystemwideController extends SystemwideController implements
 	private IGradingArtemisController artemisGUIController;
 
 	private ISubmission submission;
+	
+	private StudentsDAO studentsDAO;
 
 	public GradingSystemwideController(final IPreferenceStore preferenceStore) {
 		super(preferenceStore.getString(PreferenceConstants.GENERAL_ARTEMIS_USER), //
 				preferenceStore.getString(PreferenceConstants.GENERAL_ARTEMIS_PASSWORD), //
 				preferenceStore.getString(PreferenceConstants.GENERAL_GIT_TOKEN) //
 		);
+		this.preferenceStore = preferenceStore;
+		
 		this.createController(preferenceStore.getString(PreferenceConstants.GENERAL_ARTEMIS_URL), //
 				preferenceStore.getString(PreferenceConstants.GENERAL_ARTEMIS_USER), //
 				preferenceStore.getString(PreferenceConstants.GENERAL_ARTEMIS_PASSWORD) //
 		);
-		this.preferenceStore = preferenceStore;
 
 		this.initPreferenceStoreCallback(preferenceStore);
+		
+		
+		try {			
+			// TODO weg damit!
+			JOptionPane.showMessageDialog(null, "Students: " + this.studentsDAO.getOwnStudentsNames().stream().collect(Collectors.joining(", ")));
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
 	}
 
 	private void createController(final String artemisHost, final String username, final String password) {
 		this.artemisGUIController = new GradingArtemisController(artemisHost, username, password);
+		this.studentsDAO = loadStudentsDAO();
 	}
 
 	private IAssessmentController getAssessmentController(ISubmission submission, ICourse course, IExercise exercise) {
@@ -193,7 +213,7 @@ public class GradingSystemwideController extends SystemwideController implements
 			return false;
 		}
 
-		Optional<ISubmission> optionalSubmissionID = this.artemisGUIController.startNextAssessment(this.exercise, correctionRound);
+		Optional<ISubmission> optionalSubmissionID = this.artemisGUIController.startNextAssessment(this.exercise, correctionRound, this);
 		if (optionalSubmissionID.isEmpty()) {
 			// revert!
 			this.info("No more submissions available for Correction Round " + (correctionRound + 1) + "!");
@@ -282,4 +302,23 @@ public class GradingSystemwideController extends SystemwideController implements
 		return this.preferenceStore;
 	}
 
+
+	private StudentsDAO loadStudentsDAO() {
+		String filePath = this.getPreferences().getString(PreferenceConstants.GRADING_ABSOLUTE_STUDENTS_FILE_PATH);
+		if (filePath.isBlank()) {
+			return new EmptyStudentsDAO();
+		}
+		return new JsonFileStudentsDAO(new File(filePath));
+	}
+	
+	@Override
+	public List<String> getOwnStudentsNames() {
+		try {
+			return this.studentsDAO.getOwnStudentsNames();
+		} catch (IOException e) {
+			this.error("Student list not parseable: " + e.getMessage(), e);
+			return List.of();
+		}
+	}
+	
 }

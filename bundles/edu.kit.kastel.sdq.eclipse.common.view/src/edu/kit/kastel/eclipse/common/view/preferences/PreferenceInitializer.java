@@ -22,6 +22,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(PreferenceConstants.GENERAL_GIT_TOKEN, "");
 
 		store.setDefault(PreferenceConstants.GRADING_ABSOLUTE_CONFIG_PATH, "");
+		store.setDefault(PreferenceConstants.GRADING_ABSOLUTE_STUDENTS_FILE_PATH, "");
 		store.setDefault(PreferenceConstants.GRADING_VIEW_BUTTONS_IN_COLUMN, 3);
 		store.setDefault(PreferenceConstants.GRADING_VIEW_PREFERS_LARGE_PENALTY_TEXT_PATH, false);
 		store.setDefault(PreferenceConstants.GRADING_VIEW_PREFERS_TEXT_WRAPPING_IN_PENALTY_TEXT_PATH, false);

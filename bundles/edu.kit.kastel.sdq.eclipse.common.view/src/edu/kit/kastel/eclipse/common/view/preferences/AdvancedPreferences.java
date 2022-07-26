@@ -34,6 +34,7 @@ public class AdvancedPreferences extends FieldEditorPreferencePage implements IW
 		gitToken.getTextControl(this.getFieldEditorParent()).setEchoChar('*');
 
 		var absoluteConfigPath = new FileFieldEditor(PreferenceConstants.GRADING_ABSOLUTE_CONFIG_PATH, I18N().settingsConfigPath(), parent);
+		var absoluteStudentsFilePath = new FileFieldEditor(PreferenceConstants.GRADING_ABSOLUTE_STUDENTS_FILE_PATH, I18N().settingsStudentsFilePath(), parent);
 
 		var userPrefersLargePenaltyText = new BooleanFieldEditor(PreferenceConstants.GRADING_VIEW_PREFERS_LARGE_PENALTY_TEXT_PATH,
 				I18N().settingsLargeTextBox(), parent);
@@ -51,6 +52,7 @@ public class AdvancedPreferences extends FieldEditorPreferencePage implements IW
 		this.addField(gitToken);
 
 		this.addField(absoluteConfigPath);
+		this.addField(absoluteStudentsFilePath);
 		this.addField(columnsForGradingButtons);
 		this.addField(userPrefersLargePenaltyText);
 		this.addField(userPrefersTextWrappingInPenaltyText);

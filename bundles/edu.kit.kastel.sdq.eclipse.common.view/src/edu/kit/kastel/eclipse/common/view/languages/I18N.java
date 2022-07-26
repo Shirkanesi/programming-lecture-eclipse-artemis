@@ -51,6 +51,10 @@ public interface I18N {
 	default String settingsConfigPath() {
 		return "Grading Config Path: ";
 	}
+	
+	default String settingsStudentsFilePath() {
+		return "Students File Path: ";
+	}
 
 	default String settingsGitToken() {
 		return "Git Token (optional): ";

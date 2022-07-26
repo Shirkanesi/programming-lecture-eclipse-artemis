@@ -60,6 +60,11 @@ class GermanLanguage implements I18N {
 	public String settingsConfigPath() {
 		return "Bewertungs-Konfigurations-Datei: ";
 	}
+	
+	@Override
+	public String settingsStudentsFilePath() {
+		return "Studenten-Listen-Datei: ";
+	}
 
 	@Override
 	public String settingsGitToken() {

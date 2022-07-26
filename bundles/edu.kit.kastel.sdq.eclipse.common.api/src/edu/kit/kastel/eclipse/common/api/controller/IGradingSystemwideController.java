@@ -103,5 +103,7 @@ public interface IGradingSystemwideController extends ISystemwideController {
 	boolean isAssessmentStarted();
 
 	Optional<IExercise> getSelectedExercise();
+	
+	List<String> getOwnStudentsNames();
 
 }

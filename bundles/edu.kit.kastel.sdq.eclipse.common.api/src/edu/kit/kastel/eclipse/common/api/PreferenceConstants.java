@@ -12,6 +12,7 @@ public final class PreferenceConstants {
 	public static final String GENERAL_GIT_TOKEN = "gitToken";
 
 	public static final String GRADING_ABSOLUTE_CONFIG_PATH = "absoluteConfigPath";
+	public static final String GRADING_ABSOLUTE_STUDENTS_FILE_PATH = "absoluteStudentsFilePath";
 	public static final String GRADING_VIEW_BUTTONS_IN_COLUMN = "grading_buttons_in_column";
 	public static final String GRADING_VIEW_PREFERS_LARGE_PENALTY_TEXT_PATH = "userPreferresLargePenaltyText";
 	public static final String GRADING_VIEW_PREFERS_TEXT_WRAPPING_IN_PENALTY_TEXT_PATH = "userPrefersTextWrappingInPenaltyText";

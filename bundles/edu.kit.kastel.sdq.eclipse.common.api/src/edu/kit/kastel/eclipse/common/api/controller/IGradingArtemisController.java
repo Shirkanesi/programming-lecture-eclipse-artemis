@@ -43,7 +43,7 @@ public interface IGradingArtemisController extends IArtemisController {
 	 *         <li>the submissionID which defines what is assessed.
 	 *         <li>Optional.empty(), if no assessment is left!
 	 */
-	Optional<ISubmission> startNextAssessment(IExercise exercise);
+	Optional<ISubmission> startNextAssessment(IExercise exercise, IGradingSystemwideController systemwideController);
 
 	/**
 	 * Starts the next assessment of the given correction round. Which one is smh
@@ -56,6 +56,6 @@ public interface IGradingArtemisController extends IArtemisController {
 	 *         <li>the submissionID which defines what is assessed.
 	 *         <li>Optional.empty(), if no assessment is left!
 	 */
-	Optional<ISubmission> startNextAssessment(IExercise exercise, int correctionRound);
-
+	Optional<ISubmission> startNextAssessment(IExercise exercise, int correctionRound, IGradingSystemwideController systemwideController);
+	
 }

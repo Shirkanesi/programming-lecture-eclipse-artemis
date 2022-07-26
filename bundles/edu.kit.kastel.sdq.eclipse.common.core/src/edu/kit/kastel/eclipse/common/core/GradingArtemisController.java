@@ -12,6 +12,7 @@ import edu.kit.kastel.eclipse.common.api.artemis.mapping.IExercise;
 import edu.kit.kastel.eclipse.common.api.artemis.mapping.ISubmission;
 import edu.kit.kastel.eclipse.common.api.controller.IAssessmentController;
 import edu.kit.kastel.eclipse.common.api.controller.IGradingArtemisController;
+import edu.kit.kastel.eclipse.common.api.controller.IGradingSystemwideController;
 import edu.kit.kastel.eclipse.common.api.messages.Messages;
 import edu.kit.kastel.eclipse.common.api.model.IAnnotation;
 import edu.kit.kastel.eclipse.common.api.model.IRatingGroup;
@@ -80,24 +81,58 @@ public class GradingArtemisController extends ArtemisController implements IGrad
 	}
 
 	@Override
-	public Optional<ISubmission> startNextAssessment(IExercise exercise) {
-		return this.startNextAssessment(exercise, 0);
+	public Optional<ISubmission> startNextAssessment(IExercise exercise, IGradingSystemwideController systemwideController) {
+		return this.startNextAssessment(exercise, 0, systemwideController);
 	}
 
 	@Override
-	public Optional<ISubmission> startNextAssessment(IExercise exercise, int correctionRound) {
+	public Optional<ISubmission> startNextAssessment(IExercise exercise, int correctionRound, IGradingSystemwideController systemwideController) {
 		Optional<ILockResult> lockResultOptional;
-		try {
-			lockResultOptional = this.clientManager.getAssessmentArtemisClient().startNextAssessment(exercise, correctionRound);
-		} catch (ArtemisClientException e) {
-			this.error(Messages.ASSESSMENT_COULD_NOT_BE_STARTED_MESSAGE + e.getMessage(), e);
-			return Optional.empty();
+		
+		ILockResult lockResult;
+		
+		List<String> studentNames = systemwideController.getOwnStudentsNames();
+		
+		if (!studentNames.isEmpty()) {
+			// load from own students
+			List<ISubmission> submissions;
+			try {
+				submissions = this.clientManager.getSubmissionArtemisClient().getSubmissions(exercise, correctionRound);				
+			} catch (ArtemisClientException e) {
+				this.error(Messages.ASSESSMENT_COULD_NOT_BE_STARTED_MESSAGE + e.getMessage(), e);
+				return Optional.empty();
+			}
+			Optional<ISubmission> optionalSubmission = submissions.stream()
+				.filter(submission -> studentNames.contains(submission.getParticipantIdentifier().toLowerCase()))
+				.filter(submission -> !(submission.hasSavedAssessment() || submission.hasSubmittedAssessment()))
+				.findAny();
+			
+			if (optionalSubmission.isPresent()) {
+				ISubmission submission = optionalSubmission.get();
+				try {
+					lockResult = this.clientManager.getAssessmentArtemisClient().startAssessment(submission);
+				} catch (ArtemisClientException e) {
+					this.error(Messages.ASSESSMENT_COULD_NOT_BE_STARTED_MESSAGE + e.getMessage(), e);
+					return Optional.empty();
+				}
+			} else {
+				return Optional.empty();
+			}
+		} else {
+			// load from all students
+			try {
+				lockResultOptional = this.clientManager.getAssessmentArtemisClient().startNextAssessment(exercise, correctionRound);
+			} catch (ArtemisClientException e) {
+				this.error(Messages.ASSESSMENT_COULD_NOT_BE_STARTED_MESSAGE + e.getMessage(), e);
+				return Optional.empty();
+			}
+			if (lockResultOptional.isEmpty()) {
+				return Optional.empty();
+			}
+			lockResult = lockResultOptional.get();			
 		}
-		if (lockResultOptional.isEmpty()) {
-			return Optional.empty();
-		}
-		final ILockResult lockResult = lockResultOptional.get();
-
+		
+		
 		final int submissionID = lockResult.getSubmissionId();
 		this.lockResults.put(submissionID, lockResult);
 		try {
