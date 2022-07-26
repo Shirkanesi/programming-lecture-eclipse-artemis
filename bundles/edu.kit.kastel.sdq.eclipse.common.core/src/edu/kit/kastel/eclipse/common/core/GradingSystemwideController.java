@@ -31,6 +31,7 @@ import edu.kit.kastel.eclipse.common.core.artemis.WorkspaceUtil;
 import edu.kit.kastel.eclipse.common.core.config.EmptyStudentsDAO;
 import edu.kit.kastel.eclipse.common.core.config.JsonFileStudentsDAO;
 import edu.kit.kastel.eclipse.common.core.config.StudentsDAO;
+import edu.kit.kastel.eclipse.common.core.config.TextFileStudentsDAO;
 
 public class GradingSystemwideController extends SystemwideController implements IGradingSystemwideController {
 
@@ -304,11 +305,16 @@ public class GradingSystemwideController extends SystemwideController implements
 
 
 	private StudentsDAO loadStudentsDAO() {
-		String filePath = this.getPreferences().getString(PreferenceConstants.GRADING_ABSOLUTE_STUDENTS_FILE_PATH);
+		String filePath = this.getPreferences().getString(PreferenceConstants.GRADING_ABSOLUTE_STUDENTS_FILE_PATH).toLowerCase();
 		if (filePath.isBlank()) {
 			return new EmptyStudentsDAO();
 		}
-		return new JsonFileStudentsDAO(new File(filePath));
+		
+		if (filePath.endsWith(".json")) {
+			return new JsonFileStudentsDAO(new File(filePath));
+		}
+		
+		return new TextFileStudentsDAO(new File(filePath));
 	}
 	
 	@Override

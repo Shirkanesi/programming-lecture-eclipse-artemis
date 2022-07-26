@@ -28,7 +28,7 @@ public class JsonFileStudentsDAO implements StudentsDAO {
 		CollectionType type = oom.getTypeFactory().constructCollectionType(List.class, String.class);
 		List<String> ownStudents = oom.readValue(this.configFile, type);
 		
-		this.ownStudentsNames = ownStudents;
+		this.ownStudentsNames = ownStudents.stream().map(String::strip).map(String::toLowerCase).toList();
 	}
 	
 	@Override
