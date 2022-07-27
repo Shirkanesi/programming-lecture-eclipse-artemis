@@ -8,9 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.swing.JOptionPane;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -59,7 +58,7 @@ public class GradingSystemwideController extends SystemwideController implements
 		
 		try {			
 			// TODO weg damit!
-			JOptionPane.showMessageDialog(null, "Students: " + this.studentsDAO.getOwnStudentsNames().stream().collect(Collectors.joining(", ")));
+			System.out.println("Loaded Students: " + this.studentsDAO.getOwnStudentsNames().stream().collect(Collectors.joining(", ")));
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -318,12 +317,12 @@ public class GradingSystemwideController extends SystemwideController implements
 	}
 	
 	@Override
-	public List<String> getOwnStudentsNames() {
+	public Set<String> getOwnStudentsNames() {
 		try {
 			return this.studentsDAO.getOwnStudentsNames();
 		} catch (IOException e) {
 			this.error("Student list not parseable: " + e.getMessage(), e);
-			return List.of();
+			return Set.of();
 		}
 	}
 	

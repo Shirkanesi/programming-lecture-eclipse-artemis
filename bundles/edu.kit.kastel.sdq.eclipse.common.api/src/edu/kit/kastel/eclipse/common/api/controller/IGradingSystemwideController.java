@@ -3,6 +3,7 @@ package edu.kit.kastel.eclipse.common.api.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import edu.kit.kastel.eclipse.common.api.artemis.IProjectFileNamingStrategy;
 import edu.kit.kastel.eclipse.common.api.artemis.mapping.ICourse;
@@ -104,6 +105,6 @@ public interface IGradingSystemwideController extends ISystemwideController {
 
 	Optional<IExercise> getSelectedExercise();
 	
-	List<String> getOwnStudentsNames();
+	Set<String> getOwnStudentsNames();
 
 }

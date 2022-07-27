@@ -4,6 +4,7 @@ package edu.kit.kastel.eclipse.common.core;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import edu.kit.kastel.eclipse.common.api.ArtemisClientException;
 import edu.kit.kastel.eclipse.common.api.artemis.ILockResult;
@@ -91,7 +92,7 @@ public class GradingArtemisController extends ArtemisController implements IGrad
 		
 		ILockResult lockResult;
 		
-		List<String> studentNames = systemwideController.getOwnStudentsNames();
+		Set<String> studentNames = systemwideController.getOwnStudentsNames();
 		
 		if (!studentNames.isEmpty()) {
 			// load from own students

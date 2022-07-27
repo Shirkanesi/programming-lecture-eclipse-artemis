@@ -2,14 +2,13 @@ package edu.kit.kastel.eclipse.common.core.config;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
-public class JsonFileStudentsDAO implements StudentsDAO {
+public class JsonFileStudentsDAO extends StudentsDAO {
 
 	private List<String> ownStudentsNames;
 
@@ -20,21 +19,16 @@ public class JsonFileStudentsDAO implements StudentsDAO {
 		this.configFile = configFile;
 	}
 
-	private void parseIfNotAlreadyParsed() throws IOException {
+	@Override
+	protected void parseIfNotAlreadyParsed() throws IOException {
 		if (this.ownStudentsNames != null) {
 			return;
 		}
 
 		CollectionType type = oom.getTypeFactory().constructCollectionType(List.class, String.class);
 		List<String> ownStudents = oom.readValue(this.configFile, type);
-		
-		this.ownStudentsNames = ownStudents.stream().map(String::strip).map(String::toLowerCase).toList();
-	}
 	
-	@Override
-	public List<String> getOwnStudentsNames() throws IOException {
-		this.parseIfNotAlreadyParsed();
-		return Collections.unmodifiableList(this.ownStudentsNames);
+		this.setOwnStudentsNames(ownStudents);
 	}
 
 }

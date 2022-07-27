@@ -1,13 +1,13 @@
 package edu.kit.kastel.eclipse.common.core.config;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
-public class EmptyStudentsDAO implements StudentsDAO {
+public class EmptyStudentsDAO extends StudentsDAO {
 
 	@Override
-	public List<String> getOwnStudentsNames() throws IOException {
-		return List.of();
+	protected void parseIfNotAlreadyParsed() throws IOException {
+		this.setOwnStudentsNames(Set.of());
 	}
 
 }
